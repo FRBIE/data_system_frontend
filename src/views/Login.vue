@@ -52,14 +52,14 @@ export default defineComponent({
         username:username.value,
         password:password.value
       })
-      if(res.data.code == 200 && res.data.data ){
-        ElMessage.success('登录成功')
-        router.push({
-          path: '/dashboard'
-        })
-      }else{
-        ElMessage.error('账号或密码错误')
-      }
+        if(res.data.code == 200 && res.data.data ){
+          ElMessage.success('登录成功')
+          router.push({
+            path: '/dashboard'
+          })
+        }else {
+          ElMessage.error("账号密码错误，请重试")
+        }
     }
 
     return {
