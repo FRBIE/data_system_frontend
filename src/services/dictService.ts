@@ -1,15 +1,6 @@
-import axios from 'axios'
 import type { DictItem } from '../types/dict' // 假设有一个类型定义文件
 
-// 配置 axios 实例
-const api = axios.create({
-  baseURL: 'http://localhost:8000/api', // 替换为你的后端 API 基础路径
-  timeout: 5000,
-  headers: {
-    'Content-Type': 'application/json'
-  }
-})
-
+import api from "../request.ts"
 // 获取词条列表
 export const fetchDictList = async (): Promise<DictItem[]> => {
   try {

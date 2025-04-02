@@ -21,7 +21,7 @@ export default defineComponent({
   setup() {
     const router = useRouter()
     const username = ref('管理员')
-
+    //todo：待增加退出登录逻辑
     const logout = () => {
       router.push('/')
     }
@@ -46,14 +46,14 @@ export default defineComponent({
   background: #fff;
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
   display: flex;
-  align-items: center; 
+  align-items: center;
   justify-content: space-between;
   padding: 0 20px;
 
   .logo {
     display: flex;
     align-items: center;
-    
+
     img {
       height: 40px;
       margin-right: 10px;
@@ -76,4 +76,4 @@ export default defineComponent({
     }
   }
 }
-</style> 
+</style>

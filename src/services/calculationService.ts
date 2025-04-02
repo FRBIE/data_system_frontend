@@ -1,14 +1,6 @@
-import axios from 'axios'
 import type { CalculationAttribute } from '../types/calculation' // 假设有一个类型定义文件
+import api from "../request.ts"
 
-// 配置 axios 实例
-const api = axios.create({
-  baseURL: 'http://localhost:8000/api', // 替换为你的后端 API 基础路径
-  timeout: 5000,
-  headers: {
-    'Content-Type': 'application/json'
-  }
-})
 
 // 获取计算属性列表（带分页）
 export const fetchCalculationList = async (page: number, size: number, keyword: string = ''): Promise<{ data: CalculationAttribute[], total: number }> => {
