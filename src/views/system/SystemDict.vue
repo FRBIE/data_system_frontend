@@ -7,12 +7,12 @@
       <div class="main-content">
         <div class="dict-header">
           <div class="button-group">
-            <el-button type="primary" plain>
+            <el-button word_class="primary" plain>
             <img src="@/assets/1-1.png" class="menu-icon" />
             全部词条
           </el-button>
 
-          <el-button type="primary" plain @click="handleAdd">
+          <el-button word_class="primary" plain @click="handleAdd">
             <img src="@/assets/1-2.png" class="menu-icon" />
             添加词条
           </el-button>
@@ -33,21 +33,21 @@
         </div>
 
         <el-table :data="filteredDictList" style="width: 100%" border stripe>
-          <el-table-column prop="chineseName" label="中文名称" width="120" />
-          <el-table-column prop="englishName" label="英文名称" width="150" />
-          <el-table-column prop="englishAbbreviation" label="英文缩写" width="100" />
-          <el-table-column prop="code" label="词条编号" width="120" />
-          <el-table-column prop="type" label="词条类型" width="120">
+          <el-table-column prop="word_name" label="中文名称" width="120" />
+          <el-table-column prop="word_eng" label="英文名称" width="150" />
+          <el-table-column prop="word_short" label="英文缩写" width="100" />
+          <el-table-column prop="word_code" label="词条编号" width="120" />
+          <el-table-column prop="word_class" label="词条类型" width="120">
             <template #default="{ row }">
-              <el-tag :type="getTagType(row.type)">{{ row.type }}</el-tag>
+              <el-tag :word_class="getTagword_class(row.word_class)">{{ row.word_class }}</el-tag>
             </template>
           </el-table-column>
-          <el-table-column prop="application" label="词条应用" width="120" />
-          <el-table-column prop="alias" label="从属别名" width="120" />
+          <el-table-column prop="word_apply" label="词条应用" width="120" />
+          <el-table-column prop="word_belong" label="从属别名" width="120" />
           <el-table-column prop="actions" label="操作" width="200" fixed="right">
             <template #default="{ row }">
               <el-button size="small" @click="handleEdit(row)">编辑</el-button>
-              <el-button size="small" type="danger" @click="handleDelete(row)">删除</el-button>
+              <el-button size="small" word_class="danger" @click="handleDelete(row)">删除</el-button>
             </template>
           </el-table-column>
         </el-table>
@@ -58,36 +58,36 @@
           width="500px"
         >
           <el-form :model="formData" :rules="rules" ref="formRef" label-width="100px">
-            <el-form-item label="中文名称" prop="chineseName">
-              <el-input v-model="formData.chineseName" placeholder="请输入中文名称" />
+            <el-form-item label="中文名称" prop="word_name">
+              <el-input v-model="formData.word_name" placeholder="请输入中文名称" />
             </el-form-item>
-            <el-form-item label="英文名称" prop="englishName">
-              <el-input v-model="formData.englishName" placeholder="请输入英文名称" />
+            <el-form-item label="英文名称" prop="word_eng">
+              <el-input v-model="formData.word_eng" placeholder="请输入英文名称" />
             </el-form-item>
-            <el-form-item label="英文缩写" prop="englishAbbreviation">
-              <el-input v-model="formData.englishAbbreviation" placeholder="请输入英文缩写" />
+            <el-form-item label="英文缩写" prop="word_short">
+              <el-input v-model="formData.word_short" placeholder="请输入英文缩写" />
             </el-form-item>
-            <el-form-item label="词条编号" prop="code">
-              <el-input v-model="formData.code" placeholder="请输入词条编号" />
+            <el-form-item label="词条编号" prop="word_code">
+              <el-input v-model="formData.word_code" placeholder="请输入词条编号" />
             </el-form-item>
-            <el-form-item label="词条类型" prop="type">
-              <el-select v-model="formData.type" placeholder="请选择词条类型">
+            <el-form-item label="词条类型" prop="word_class">
+              <el-select v-model="formData.word_class" placeholder="请选择词条类型">
                 <el-option label="模板类别" value="template" />
                 <el-option label="临床信息" value="clinical" />
                 <el-option label="检验指标" value="indicator" />
               </el-select>
             </el-form-item>
-            <el-form-item label="词条应用" prop="application">
-              <el-input v-model="formData.application" placeholder="请输入词条应用" />
+            <el-form-item label="词条应用" prop="word_apply">
+              <el-input v-model="formData.word_apply" placeholder="请输入词条应用" />
             </el-form-item>
-            <el-form-item label="从属别名" prop="alias">
-              <el-input v-model="formData.alias" placeholder="请输入从属别名" />
+            <el-form-item label="从属别名" prop="word_belong">
+              <el-input v-model="formData.word_belong" placeholder="请输入从属别名" />
             </el-form-item>
           </el-form>
           <template #footer>
             <span class="dialog-footer">
               <el-button @click="dialogVisible = false">取 消</el-button>
-              <el-button type="primary" @click="handleSubmit">确 定</el-button>
+              <el-button word_class="primary" @click="handleSubmit">确 定</el-button>
             </span>
           </template>
         </el-dialog>
@@ -95,22 +95,21 @@
     </div>
   </div>
 </template>
-
 <script lang="ts">
-import { defineComponent, ref, computed } from 'vue'
+import {defineComponent, ref, computed, onMounted} from 'vue'
 import { Plus, Search } from '@element-plus/icons-vue'
-import type { FormInstance } from 'element-plus'
 import { ElMessage, ElMessageBox } from 'element-plus'
+import { dictionaryList, dictionaryCreate, dictionaryUpdate, dictionaryDelete } from '@/api/dictionary'
 
 interface DictItem {
   id?: number
-  chineseName: string
-  englishName: string
-  englishAbbreviation: string
-  code: string
-  type: string
-  application: string
-  alias: string
+  word_name: string
+  word_eng: string
+  word_short: string
+  word_code: string
+  word_class: string
+  word_apply: string
+  word_belong: string
 }
 
 export default defineComponent({
@@ -123,103 +122,75 @@ export default defineComponent({
     const searchKeyword = ref('')
     const dialogVisible = ref(false)
     const isEdit = ref(false)
-    const formRef = ref<FormInstance>()
+    const formRef = ref()
 
     const formData = ref<DictItem>({
-      chineseName: '',
-      englishName: '',
-      englishAbbreviation: '',
-      code: '',
-      type: '',
-      application: '',
-      alias: ''
+      word_name: '',
+      word_eng: '',
+      word_short: '',
+      word_code: '',
+      word_class: '',
+      word_apply: '',
+      word_belong: ''
     })
 
-    const dictList = ref<DictItem[]>([
-      {
-        id: 1,
-        chineseName: '检验单',
-        englishName: 'Testing Sheet',
-        englishAbbreviation: 'TS',
-        code: 'I895612',
-        type: 'template',
-        application: '模板类别',
-        alias: '模板类别名称'
-      },
-      {
-        id: 2,
-        chineseName: '检查单',
-        englishName: 'Examination Sheet',
-        englishAbbreviation: 'ES',
-        code: 'I895213',
-        type: 'template',
-        application: '模板类别',
-        alias: '模板类别名称'
-      },
-      {
-        id: 3,
-        chineseName: '术前检查',
-        englishName: 'Preoperative Examination',
-        englishAbbreviation: 'PreE',
-        code: 'I865214',
-        type: 'clinical',
-        application: '临床信息',
-        alias: '检验指标'
-      },
-      {
-        id: 4,
-        chineseName: '术后检查',
-        englishName: 'Postoperative Examination',
-        englishAbbreviation: 'PostE',
-        code: 'I895215',
-        type: 'clinical',
-        application: '临床信息',
-        alias: '检验指标'
-      }
-    ])
+    const dictList = ref<DictItem[]>([])
 
     const rules = {
-      chineseName: [{ required: true, message: '请输入中文名称', trigger: 'blur' }],
-      englishName: [{ required: true, message: '请输入英文名称', trigger: 'blur' }],
-      englishAbbreviation: [{ required: true, message: '请输入英文缩写', trigger: 'blur' }],
-      code: [{ required: true, message: '请输入词条编号', trigger: 'blur' }],
-      type: [{ required: true, message: '请选择词条类型', trigger: 'change' }],
-      application: [{ required: true, message: '请输入词条应用', trigger: 'blur' }],
-      alias: [{ required: true, message: '请输入从属别名', trigger: 'blur' }]
+      word_name: [{ required: true, message: '请输入中文名称', trigger: 'blur' }],
+      word_eng: [{ required: true, message: '请输入英文名称', trigger: 'blur' }],
+      word_short: [{ required: true, message: '请输入英文缩写', trigger: 'blur' }],
+      word_code: [{ required: true, message: '请输入词条编号', trigger: 'blur' }],
+      word_class: [{ required: true, message: '请选择词条类型', trigger: 'change' }],
+      word_apply: [{ required: true, message: '请输入词条应用', trigger: 'blur' }],
+      word_belong: [{ required: true, message: '请输入从属别名', trigger: 'blur' }]
     }
 
     const dialogTitle = computed(() => isEdit.value ? '编辑词条' : '添加词条')
 
     const filteredDictList = computed(() => {
       if (!searchKeyword.value) return dictList.value
-      return dictList.value.filter(item => 
-        item.chineseName.includes(searchKeyword.value) || 
-        item.englishName.includes(searchKeyword.value) ||
-        item.englishAbbreviation.includes(searchKeyword.value) ||
-        item.code.includes(searchKeyword.value) ||
-        item.alias.includes(searchKeyword.value)
+      return dictList.value.filter(item =>
+          item.word_name.includes(searchKeyword.value) ||
+          item.word_eng.includes(searchKeyword.value) ||
+          item.word_short.includes(searchKeyword.value) ||
+          item.word_code.includes(searchKeyword.value) ||
+          item.word_belong.includes(searchKeyword.value)
       )
     })
 
-    const getTagType = (type: string) => {
-      const typeMap: Record<string, string> = {
+    const getTagword_class = (word_class: string) => {
+      const word_classMap: Record<string, string> = {
         template: 'warning',
         clinical: 'success',
         indicator: 'danger'
       }
-      return typeMap[type] || 'info'
+      return word_classMap[word_class] || 'info'
+    }
+
+    // 获取词条列表
+    const fetchDictList = async () => {
+      debugger
+      try {
+        const res = await dictionaryList({})
+        // console.log(JSON.stringify(res.data.data))
+        dictList.value = res.data.data.list
+      } catch (error) {
+        console.error('获取词条列表失败:', error)
+        ElMessage.error('获取词条列表失败')
+      }
     }
 
     const handleAdd = () => {
       isEdit.value = false
       formData.value = {
-        chineseName: '',
-        englishName: '',
-        englishAbbreviation: '',
-        code: '',
-        type: '',
-        application: '',
-        alias: ''
+        word_name: '',
+        word_eng: '',
+        word_short: '',
+        word_code: '',
+        word_class: '',
+        word_apply: '',
+        word_belong: ''
       }
       dialogVisible.value = true
     }
@@ -230,42 +201,58 @@ export default defineComponent({
       dialogVisible.value = true
     }
 
-    const handleDelete = (row: DictItem) => {
-      ElMessageBox.confirm(
-        '确定要删除该词条吗？',
-        '警告',
-        {
-          confirmButtonText: '确定',
-          cancelButtonText: '取消',
-          type: 'warning'
+    const handleDelete = async (row: DictItem) => {
+      try {
+        await ElMessageBox.confirm(
+            '确定要删除该词条吗？',
+            '警告',
+            {
+              confirmButtonText: '确定',
+              cancelButtonText: '取消',
+              word_class: 'warning'
+            }
+        )
+
+        if (row.id) {
+          await dictionaryDelete({ id: row.id })
+          await fetchDictList()
+          ElMessage.success('删除成功')
         }
-      ).then(() => {
-        dictList.value = dictList.value.filter(item => item.id !== row.id)
-        ElMessage.success('删除成功')
-      })
+      } catch (error) {
+        console.error('删除词条失败:', error)
+      }
     }
 
     const handleSubmit = async () => {
       if (!formRef.value) return
-      
-      await formRef.value.validate((valid) => {
-        if (valid) {
-          if (isEdit.value) {
-            const index = dictList.value.findIndex(item => item.id === formData.value.id)
-            if (index > -1) {
-              dictList.value[index] = { ...formData.value }
+
+      try {
+        await formRef.value.validate(async (valid: boolean) => {
+          if (valid) {
+            if (isEdit.value && formData.value.id) {
+              // 编辑词条
+              await dictionaryUpdate({
+                id: formData.value.id
+              }, formData.value)
+              ElMessage.success('编辑成功')
+            } else {
+              // 添加词条
+              await dictionaryCreate(formData.value)
+              ElMessage.success('添加成功')
             }
-          } else {
-            dictList.value.push({
-              ...formData.value,
-              id: Date.now()
-            })
+            await fetchDictList()
+            dialogVisible.value = false
           }
-          dialogVisible.value = false
-          ElMessage.success(isEdit.value ? '编辑成功' : '添加成功')
-        }
-      })
+        })
+      } catch (error) {
+        console.error('操作失败:', error)
+        ElMessage.error('操作失败')
+      }
     }
+
+    onMounted(() => {
+      fetchDictList()
+    })
 
     return {
       searchKeyword,
@@ -274,8 +261,9 @@ export default defineComponent({
       formRef,
       rules,
       dialogTitle,
+      dictList,
       filteredDictList,
-      getTagType,
+      getTagword_class,
       handleAdd,
       handleEdit,
       handleDelete,

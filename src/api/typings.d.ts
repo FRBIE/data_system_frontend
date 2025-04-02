@@ -235,6 +235,52 @@ declare namespace API {
     id: number;
   };
 
+  type Dictionary = {
+    /** Id */
+    id?: number;
+    /** Word code */
+    word_code: string;
+    /** Word name */
+    word_name: string;
+    /** Word eng */
+    word_eng?: string;
+    /** Word short */
+    word_short?: string;
+    /** Word class */
+    word_class: string;
+    /** Word apply */
+    word_apply: string;
+    /** Word belong */
+    word_belong?: string;
+  };
+
+  type dictionaryDeleteParams = {
+    /** A unique integer value identifying this dictionary. */
+    id: number;
+  };
+
+  type dictionaryListParams = {
+    /** A page number within the paginated result set. */
+    page?: number;
+    /** Number of results to return per page. */
+    page_size?: number;
+  };
+
+  type dictionaryPartialUpdateParams = {
+    /** A unique integer value identifying this dictionary. */
+    id: number;
+  };
+
+  type dictionaryReadParams = {
+    /** A unique integer value identifying this dictionary. */
+    id: number;
+  };
+
+  type dictionaryUpdateParams = {
+    /** A unique integer value identifying this dictionary. */
+    id: number;
+  };
+
   type DocumentChart = {
     /** Id */
     id: number;

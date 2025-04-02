@@ -7,7 +7,7 @@ export async function loginCreate(
   body: API.Login,
   options?: { [key: string]: any }
 ) {
-  return request<any>("/login/", {
+  return request<API.Login>("/login/", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
