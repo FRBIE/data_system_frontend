@@ -15,19 +15,20 @@
 <script lang="ts">
 import { defineComponent, ref } from 'vue'
 import { useRouter } from 'vue-router'
+import { useLoginUserStore } from "@/stores/LoginStore.ts"; // 确保路径正确
 
 export default defineComponent({
   name: 'Header',
   setup() {
-    const router = useRouter()
-    const username = ref('管理员')
-    //todo：待增加退出登录逻辑
+    const router = useRouter();
+    const loginUserStore = useLoginUserStore();
+    //退出登录逻辑
     const logout = () => {
-      router.push('/')
-    }
+      loginUserStore.logoutUser(); // 调用封装好的 `logoutUser` 方法
+      router.push('/login');
+    };
 
     return {
-      username,
       logout
     }
   }

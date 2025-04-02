@@ -45,15 +45,13 @@ export default defineComponent({
     const remember = ref(false)
 
     const handleLogin = async () => {
-      // 模拟登录成功
-      // localStorage.setItem('token', 'dummy-token')
-      // router.push('/dashboard')
       const res = await loginCreate({
         username:username.value,
         password:password.value
       })
         if(res.data.code == 200 && res.data.data ){
           ElMessage.success('登录成功')
+          localStorage.setItem('userLoginStatus', res.data.access)
           router.push({
             path: '/dashboard'
           })

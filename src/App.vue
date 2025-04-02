@@ -1,7 +1,6 @@
 <script lang="ts">
 import { defineComponent } from 'vue'
-import request from "@/request.ts";
-
+import '@/access'
 export default defineComponent({
   name: 'App'
 })
