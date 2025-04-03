@@ -170,7 +170,7 @@ export default defineComponent({
 
     // 获取词条列表
     const fetchDictList = async () => {
-      debugger
+      // debugger
       try {
         const res = await dictionaryList({})
         // console.log(JSON.stringify(res.data.data))
