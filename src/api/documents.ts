@@ -3,9 +3,21 @@
 import request from "@/request";
 
 /** 此处后端没有提供注释 GET /documents/ */
-export async function documentsList(options?: { [key: string]: any }) {
-  return request<API.Documents[]>("/documents/", {
+export async function documentsList(
+  // 叠加生成的Param类型 (非body参数swagger默认没有生成对象)
+  params: API.documentsListParams,
+  options?: { [key: string]: any }
+) {
+  return request<{
+    count: number;
+    next?: string;
+    previous?: string;
+    results: API.Documents[];
+  }>("/documents/", {
     method: "GET",
+    params: {
+      ...params,
+    },
     ...(options || {}),
   });
 }

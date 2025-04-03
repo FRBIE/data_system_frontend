@@ -3,9 +3,21 @@
 import request from "@/request";
 
 /** 此处后端没有提供注释 GET /archives/ */
-export async function archivesList(options?: { [key: string]: any }) {
-  return request<API.Archive[]>("/archives/", {
+export async function archivesList(
+  // 叠加生成的Param类型 (非body参数swagger默认没有生成对象)
+  params: API.archivesListParams,
+  options?: { [key: string]: any }
+) {
+  return request<{
+    count: number;
+    next?: string;
+    previous?: string;
+    results: API.Archive[];
+  }>("/archives/", {
     method: "GET",
+    params: {
+      ...params,
+    },
     ...(options || {}),
   });
 }

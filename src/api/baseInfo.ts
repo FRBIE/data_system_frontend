@@ -3,9 +3,21 @@
 import request from "@/request";
 
 /** 此处后端没有提供注释 GET /base-info/ */
-export async function baseInfoList(options?: { [key: string]: any }) {
-  return request<API.BaseInfo[]>("/base-info/", {
+export async function baseInfoList(
+  // 叠加生成的Param类型 (非body参数swagger默认没有生成对象)
+  params: API.baseInfoListParams,
+  options?: { [key: string]: any }
+) {
+  return request<{
+    count: number;
+    next?: string;
+    previous?: string;
+    results: API.BaseInfo[];
+  }>("/base-info/", {
     method: "GET",
+    params: {
+      ...params,
+    },
     ...(options || {}),
   });
 }

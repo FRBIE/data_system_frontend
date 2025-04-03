@@ -24,6 +24,13 @@ declare namespace API {
     id: number;
   };
 
+  type archiveCaseRelativesListParams = {
+    /** A page number within the paginated result set. */
+    page?: number;
+    /** Number of results to return per page. */
+    page_size?: number;
+  };
+
   type archiveCaseRelativesPartialUpdateParams = {
     /** A unique value identifying this archive case relative. */
     id: number;
@@ -42,6 +49,13 @@ declare namespace API {
   type archivesDeleteParams = {
     /** A unique value identifying this archive. */
     id: number;
+  };
+
+  type archivesListParams = {
+    /** A page number within the paginated result set. */
+    page?: number;
+    /** Number of results to return per page. */
+    page_size?: number;
   };
 
   type archivesPartialUpdateParams = {
@@ -85,6 +99,13 @@ declare namespace API {
     id: number;
   };
 
+  type baseInfoListParams = {
+    /** A page number within the paginated result set. */
+    page?: number;
+    /** Number of results to return per page. */
+    page_size?: number;
+  };
+
   type baseInfoPartialUpdateParams = {
     /** A unique value identifying this base info. */
     id: number;
@@ -114,6 +135,13 @@ declare namespace API {
   type casesDeleteParams = {
     /** A unique value identifying this cases. */
     id: number;
+  };
+
+  type casesListParams = {
+    /** A page number within the paginated result set. */
+    page?: number;
+    /** Number of results to return per page. */
+    page_size?: number;
   };
 
   type casesPartialUpdateParams = {
@@ -147,6 +175,13 @@ declare namespace API {
     id: number;
   };
 
+  type clinicalInfoListParams = {
+    /** A page number within the paginated result set. */
+    page?: number;
+    /** Number of results to return per page. */
+    page_size?: number;
+  };
+
   type clinicalInfoPartialUpdateParams = {
     /** A unique integer value identifying this clinical info. */
     id: number;
@@ -178,6 +213,13 @@ declare namespace API {
     id: number;
   };
 
+  type dataTablesListParams = {
+    /** A page number within the paginated result set. */
+    page?: number;
+    /** Number of results to return per page. */
+    page_size?: number;
+  };
+
   type dataTablesPartialUpdateParams = {
     /** A unique value identifying this data table. */
     id: number;
@@ -190,6 +232,52 @@ declare namespace API {
 
   type dataTablesUpdateParams = {
     /** A unique value identifying this data table. */
+    id: number;
+  };
+
+  type Dictionary = {
+    /** Id */
+    id?: number;
+    /** Word code */
+    word_code: string;
+    /** Word name */
+    word_name: string;
+    /** Word eng */
+    word_eng?: string;
+    /** Word short */
+    word_short?: string;
+    /** Word class */
+    word_class: string;
+    /** Word apply */
+    word_apply: string;
+    /** Word belong */
+    word_belong?: string;
+  };
+
+  type dictionaryDeleteParams = {
+    /** A unique integer value identifying this dictionary. */
+    id: number;
+  };
+
+  type dictionaryListParams = {
+    /** A page number within the paginated result set. */
+    page?: number;
+    /** Number of results to return per page. */
+    page_size?: number;
+  };
+
+  type dictionaryPartialUpdateParams = {
+    /** A unique integer value identifying this dictionary. */
+    id: number;
+  };
+
+  type dictionaryReadParams = {
+    /** A unique integer value identifying this dictionary. */
+    id: number;
+  };
+
+  type dictionaryUpdateParams = {
+    /** A unique integer value identifying this dictionary. */
     id: number;
   };
 
@@ -213,6 +301,13 @@ declare namespace API {
   type documentChartsDeleteParams = {
     /** A unique value identifying this document chart. */
     id: number;
+  };
+
+  type documentChartsListParams = {
+    /** A page number within the paginated result set. */
+    page?: number;
+    /** Number of results to return per page. */
+    page_size?: number;
   };
 
   type documentChartsPartialUpdateParams = {
@@ -248,6 +343,13 @@ declare namespace API {
     id: number;
   };
 
+  type documentsListParams = {
+    /** A page number within the paginated result set. */
+    page?: number;
+    /** Number of results to return per page. */
+    page_size?: number;
+  };
+
   type documentsPartialUpdateParams = {
     /** A unique value identifying this documents. */
     id: number;
@@ -277,6 +379,13 @@ declare namespace API {
   type examinationImagesDeleteParams = {
     /** A unique value identifying this examination images. */
     id: number;
+  };
+
+  type examinationImagesListParams = {
+    /** A page number within the paginated result set. */
+    page?: number;
+    /** Number of results to return per page. */
+    page_size?: number;
   };
 
   type examinationImagesPartialUpdateParams = {
@@ -324,6 +433,13 @@ declare namespace API {
     id: number;
   };
 
+  type examinationSheetsListParams = {
+    /** A page number within the paginated result set. */
+    page?: number;
+    /** Number of results to return per page. */
+    page_size?: number;
+  };
+
   type examinationSheetsPartialUpdateParams = {
     /** A unique value identifying this examination sheet. */
     id: number;
@@ -355,6 +471,13 @@ declare namespace API {
   type identityDeleteParams = {
     /** A unique value identifying this identity. */
     id: number;
+  };
+
+  type identityListParams = {
+    /** A page number within the paginated result set. */
+    page?: number;
+    /** Number of results to return per page. */
+    page_size?: number;
   };
 
   type identityPartialUpdateParams = {
@@ -402,6 +525,13 @@ declare namespace API {
     id: number;
   };
 
+  type imagesListParams = {
+    /** A page number within the paginated result set. */
+    page?: number;
+    /** Number of results to return per page. */
+    page_size?: number;
+  };
+
   type imagesPartialUpdateParams = {
     /** A unique value identifying this image. */
     id: number;
@@ -415,6 +545,13 @@ declare namespace API {
   type imagesUpdateParams = {
     /** A unique value identifying this image. */
     id: number;
+  };
+
+  type Login = {
+    /** Username */
+    username: string;
+    /** Password */
+    password: string;
   };
 
   type Shape = {
@@ -445,6 +582,13 @@ declare namespace API {
   type shapesDeleteParams = {
     /** A unique value identifying this shape. */
     id: number;
+  };
+
+  type shapesListParams = {
+    /** A page number within the paginated result set. */
+    page?: number;
+    /** Number of results to return per page. */
+    page_size?: number;
   };
 
   type shapesPartialUpdateParams = {
@@ -498,6 +642,13 @@ declare namespace API {
     id: number;
   };
 
+  type testingSheetsListParams = {
+    /** A page number within the paginated result set. */
+    page?: number;
+    /** Number of results to return per page. */
+    page_size?: number;
+  };
+
   type testingSheetsPartialUpdateParams = {
     /** A unique value identifying this testing sheet. */
     id: number;
@@ -545,6 +696,13 @@ declare namespace API {
     id: number;
   };
 
+  type textsListParams = {
+    /** A page number within the paginated result set. */
+    page?: number;
+    /** Number of results to return per page. */
+    page_size?: number;
+  };
+
   type textsPartialUpdateParams = {
     /** A unique value identifying this text. */
     id: number;
@@ -572,5 +730,16 @@ declare namespace API {
     refresh: string;
     /** Access */
     access?: string;
+  };
+
+  type User = {
+    /** ID */
+    id?: number;
+    /** Username Required. 150 characters or fewer. Letters, digits and @/./+/-/_ only. */
+    username: string;
+    /** Email address */
+    email?: string;
+    /** Password */
+    password: string;
   };
 }

@@ -3,9 +3,21 @@
 import request from "@/request";
 
 /** 此处后端没有提供注释 GET /shapes/ */
-export async function shapesList(options?: { [key: string]: any }) {
-  return request<API.Shape[]>("/shapes/", {
+export async function shapesList(
+  // 叠加生成的Param类型 (非body参数swagger默认没有生成对象)
+  params: API.shapesListParams,
+  options?: { [key: string]: any }
+) {
+  return request<{
+    count: number;
+    next?: string;
+    previous?: string;
+    results: API.Shape[];
+  }>("/shapes/", {
     method: "GET",
+    params: {
+      ...params,
+    },
     ...(options || {}),
   });
 }

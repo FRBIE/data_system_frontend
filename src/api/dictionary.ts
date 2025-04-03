@@ -87,11 +87,7 @@ export async function dictionaryDelete(
 /** 获取、更新或删除指定 ID 的词条 PATCH /dictionary/${param0}/ */
 export async function dictionaryPartialUpdate(
   // 叠加生成的Param类型 (非body参数swagger默认没有生成对象)
-<<<<<<< HEAD
   params: API.dictionaryPartialUpdateParams,
-=======
-  params: API.identityPartialUpdateParams,
->>>>>>> f2a64e9 (修正按钮显示异常的问题)
   body: API.Dictionary,
   options?: { [key: string]: any }
 ) {
