@@ -3,21 +3,9 @@
 import request from "@/request";
 
 /** 此处后端没有提供注释 GET /examination-sheets/ */
-export async function examinationSheetsList(
-  // 叠加生成的Param类型 (非body参数swagger默认没有生成对象)
-  params: API.examinationSheetsListParams,
-  options?: { [key: string]: any }
-) {
-  return request<{
-    count: number;
-    next?: string;
-    previous?: string;
-    results: API.ExaminationSheet[];
-  }>("/examination-sheets/", {
+export async function examinationSheetsList(options?: { [key: string]: any }) {
+  return request<API.ExaminationSheet[]>("/examination-sheets/", {
     method: "GET",
-    params: {
-      ...params,
-    },
     ...(options || {}),
   });
 }

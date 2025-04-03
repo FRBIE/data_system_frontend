@@ -3,21 +3,9 @@
 import request from "@/request";
 
 /** 此处后端没有提供注释 GET /texts/ */
-export async function textsList(
-  // 叠加生成的Param类型 (非body参数swagger默认没有生成对象)
-  params: API.textsListParams,
-  options?: { [key: string]: any }
-) {
-  return request<{
-    count: number;
-    next?: string;
-    previous?: string;
-    results: API.Text[];
-  }>("/texts/", {
+export async function textsList(options?: { [key: string]: any }) {
+  return request<API.Text[]>("/texts/", {
     method: "GET",
-    params: {
-      ...params,
-    },
     ...(options || {}),
   });
 }

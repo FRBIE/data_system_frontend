@@ -3,21 +3,11 @@
 import request from "@/request";
 
 /** 此处后端没有提供注释 GET /archive-case-relatives/ */
-export async function archiveCaseRelativesList(
-  // 叠加生成的Param类型 (非body参数swagger默认没有生成对象)
-  params: API.archiveCaseRelativesListParams,
-  options?: { [key: string]: any }
-) {
-  return request<{
-    count: number;
-    next?: string;
-    previous?: string;
-    results: API.ArchiveCaseRelative[];
-  }>("/archive-case-relatives/", {
+export async function archiveCaseRelativesList(options?: {
+  [key: string]: any;
+}) {
+  return request<API.ArchiveCaseRelative[]>("/archive-case-relatives/", {
     method: "GET",
-    params: {
-      ...params,
-    },
     ...(options || {}),
   });
 }

@@ -5,49 +5,42 @@
     <div class="chart-header">
       <div class="chart-types">
         <el-radio-group v-model="currentChart" class="chart-selector">
-  <el-radio-button label="bar">
-    <img src="@/assets/5-1.png" class="chart-icon" />
-    柱状图
-  </el-radio-button>
-  
-  <el-radio-button label="bar-h">
-    <img src="@/assets/5-2.png" class="chart-icon" />
-    水平柱状图
-  </el-radio-button>
-
-  <el-radio-button label="line">
-    <img src="@/assets/5-3.png" class="chart-icon" />
-    折线图
-  </el-radio-button>
-
-  <el-radio-button label="scatter">
-    <img src="@/assets/5-4.png" class="chart-icon" />
-    散点图
-  </el-radio-button>
-
-  <el-radio-button label="heatmap">
-    <img src="@/assets/5-5.png" class="chart-icon" />
-    热力图
-  </el-radio-button>
-
-  <el-radio-button label="gri">
-    <img src="@/assets/5-6.png" class="chart-icon" />
-    生存曲线图
-  </el-radio-button>
-  <el-radio-button label="pie">
-    <img src="@/assets/5-7.png" class="chart-icon" />
-    饼图
-  </el-radio-button>
-
-  <el-radio-button label="grid">
-    <img src="@/assets/5-8.png" class="chart-icon" />
-    统计三线表
-  </el-radio-button>
-</el-radio-group>
-
+          <el-radio-button label="bar">
+            <img src="@/assets/5-1.png" class="chart-icon" />
+            柱状图
+          </el-radio-button>
+          <el-radio-button label="bar-h">
+            <img src="@/assets/5-2.png" class="chart-icon" />
+            水平柱状图
+          </el-radio-button>
+          <el-radio-button label="line">
+            <img src="@/assets/5-3.png" class="chart-icon" />
+            折线图
+          </el-radio-button>
+          <el-radio-button label="scatter">
+            <img src="@/assets/5-4.png" class="chart-icon" />
+            散点图
+          </el-radio-button>
+          <el-radio-button label="heatmap">
+            <img src="@/assets/5-5.png" class="chart-icon" />
+            热力图
+          </el-radio-button>
+          <el-radio-button label="gri">
+            <img src="@/assets/5-6.png" class="chart-icon" />
+            生存曲线图
+          </el-radio-button>
+          <el-radio-button label="pie">
+            <img src="@/assets/5-7.png" class="chart-icon" />
+            饼图
+          </el-radio-button>
+          <el-radio-button label="grid">
+            <img src="@/assets/5-8.png" class="chart-icon" />
+            统计三线表
+          </el-radio-button>
+        </el-radio-group>
       </div>
       <div class="chart-actions">
-        <el-button type="primary" >保存图表</el-button>
+        <el-button type="primary">保存图表</el-button>
         <el-button @click="exportChart">导出图表</el-button>
         <el-button type="danger" @click="resetChart">重置图表</el-button>
       </div>
@@ -135,7 +128,6 @@
             </el-checkbox-group>
           </el-form-item>
         </el-form>
-        <!-- 样式和属性配置可以类似添加 -->
       </div>
     </div>
   </div>
@@ -256,21 +248,21 @@ export default defineComponent({
 .chart-selector {
   display: flex;
   justify-content: space-around;
-  flex-wrap: wrap; // 适应不同屏幕
+  flex-wrap: wrap;
 
   .el-radio-button {
     display: flex;
-    flex-direction: column; // 让图标在文字上方
+    flex-direction: column;
     align-items: center;
     justify-content: center;
     text-align: center;
-    padding: 10px; // 增加间距，防止挤在一起
+    padding: 10px;
   }
 
   .chart-icon {
-    width: 24px;  // 图标宽度
-    height: 24px; // 图标高度
-    margin-bottom: 4px; // 让图标和文字之间有一点间距
+    width: 24px;
+    height: 24px;
+    margin-bottom: 4px;
   }
 }
 
@@ -317,10 +309,22 @@ export default defineComponent({
       border-right: 1px solid #e9e9e9;
 
       .sidebar-buttons {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
         margin-bottom: 20px;
+
         .el-button {
           width: 100%;
-          margin-bottom: 10px;
+          text-align: left; // 强制文本左对齐
+          padding: 10px 12px; // 统一内边距，调整左侧内边距
+          box-sizing: border-box;
+          font-size: 14px;
+          line-height: 1;
+          margin: 0; // 移除可能的外边距
+          display: flex; // 使用 flex 布局
+          justify-content: flex-start; // 强制内容左对齐
+          align-items: center; // 垂直居中
         }
       }
 

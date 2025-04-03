@@ -173,7 +173,7 @@ export default defineComponent({
       // debugger
       try {
         const res = await dictionaryList({})
-        // console.log(JSON.stringify(res.data.data))
+        console.log(JSON.stringify(res.data.data))
         dictList.value = res.data.data.list
       } catch (error) {
         console.error('获取词条列表失败:', error)

@@ -8,7 +8,6 @@ import * as baseInfo from "./baseInfo";
 import * as cases from "./cases";
 import * as clinicalInfo from "./clinicalInfo";
 import * as dataTables from "./dataTables";
-import * as dictionary from "./dictionary";
 import * as documentCharts from "./documentCharts";
 import * as documents from "./documents";
 import * as examinationImages from "./examinationImages";
@@ -28,7 +27,6 @@ export default {
   cases,
   clinicalInfo,
   dataTables,
-  dictionary,
   documentCharts,
   documents,
   examinationImages,

@@ -3,21 +3,9 @@
 import request from "@/request";
 
 /** 此处后端没有提供注释 GET /data-tables/ */
-export async function dataTablesList(
-  // 叠加生成的Param类型 (非body参数swagger默认没有生成对象)
-  params: API.dataTablesListParams,
-  options?: { [key: string]: any }
-) {
-  return request<{
-    count: number;
-    next?: string;
-    previous?: string;
-    results: API.DataTable[];
-  }>("/data-tables/", {
+export async function dataTablesList(options?: { [key: string]: any }) {
+  return request<API.DataTable[]>("/data-tables/", {
     method: "GET",
-    params: {
-      ...params,
-    },
     ...(options || {}),
   });
 }
