@@ -6,7 +6,7 @@ import path from 'path'
 export default defineConfig({
   plugins: [vue()],
   server: {
-    port: 5431,
+    port: 5371,
     proxy: {  // 使用 Vite 标准 proxy 配置
       '/api': {
         target: 'http://127.0.0.1:8000',
@@ -16,7 +16,7 @@ export default defineConfig({
     }
   },
   preview: {
-    port: 5431,  // 设置预览服务器端口
+    port: 5371,  // 设置预览服务器端口
   },
   resolve: {
     alias: {
