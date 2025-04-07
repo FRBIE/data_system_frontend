@@ -1,4 +1,44 @@
 declare namespace API {
+  type AnalysisSheet = {
+    /** Id */
+    id?: number;
+    /** Analysis table id */
+    analysis_table_id: number;
+    /** Sheet code */
+    sheet_code: string;
+    /** Sheet name */
+    sheet_name: string;
+    /** Remark */
+    remark?: string;
+  };
+
+  type analysisSheetDeleteParams = {
+    /** A unique integer value identifying this analysis sheet. */
+    id: number;
+  };
+
+  type analysisSheetListParams = {
+    /** A page number within the paginated result set. */
+    page?: number;
+    /** Number of results to return per page. */
+    page_size?: number;
+  };
+
+  type analysisSheetPartialUpdateParams = {
+    /** A unique integer value identifying this analysis sheet. */
+    id: number;
+  };
+
+  type analysisSheetReadParams = {
+    /** A unique integer value identifying this analysis sheet. */
+    id: number;
+  };
+
+  type analysisSheetUpdateParams = {
+    /** A unique integer value identifying this analysis sheet. */
+    id: number;
+  };
+
   type Archive = {
     /** Id */
     id: number;
@@ -232,6 +272,46 @@ declare namespace API {
 
   type dataTablesUpdateParams = {
     /** A unique value identifying this data table. */
+    id: number;
+  };
+
+  type DataTemplates = {
+    /** Id */
+    id?: number;
+    /** Name */
+    name: string;
+    /** Description */
+    description?: string;
+    /** Category id */
+    category_id: number;
+    /** Used n */
+    used_n: number;
+  };
+
+  type dataTemplatesDeleteParams = {
+    /** A unique integer value identifying this data template. */
+    id: number;
+  };
+
+  type dataTemplatesListParams = {
+    /** A page number within the paginated result set. */
+    page?: number;
+    /** Number of results to return per page. */
+    page_size?: number;
+  };
+
+  type dataTemplatesPartialUpdateParams = {
+    /** A unique integer value identifying this data template. */
+    id: number;
+  };
+
+  type dataTemplatesReadParams = {
+    /** A unique integer value identifying this data template. */
+    id: number;
+  };
+
+  type dataTemplatesUpdateParams = {
+    /** A unique integer value identifying this data template. */
     id: number;
   };
 

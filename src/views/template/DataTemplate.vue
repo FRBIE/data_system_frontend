@@ -3,23 +3,20 @@
     <!-- 顶部导航区域 -->
     <div class="template-header">
       <div class="header-left">
-        <el-button-group class="custom-button-group" >
-  <el-button type="primary"plain >
-    <img src="@/assets/2-1.png" class="button-icon" />
-    全部数据模版
-  </el-button>
-
-  <el-button @click="handleAddBasicTemplate" > 
-    <img src="@/assets/2-2.png" class="button-icon" />
-    添加基础数据模版
-  </el-button>
-
-  <el-button @click="handleAddCustomTemplate">
-    <img src="@/assets/2-2.png" class="button-icon" />
-    添加自定义数据模版
-  </el-button>
-</el-button-group>
-
+        <el-button-group class="custom-button-group">
+          <el-button type="primary" plain>
+            <img src="@/assets/2-1.png" class="button-icon" />
+            全部数据模版
+          </el-button>
+          <el-button @click="handleAddBasicTemplate">
+            <img src="@/assets/2-2.png" class="button-icon" />
+            添加基础数据模版
+          </el-button>
+          <el-button @click="handleAddCustomTemplate">
+            <img src="@/assets/2-2.png" class="button-icon" />
+            添加自定义数据模版
+          </el-button>
+        </el-button-group>
       </div>
       <div class="header-right">
         <el-input
@@ -107,6 +104,12 @@
 import { defineComponent, ref, computed } from 'vue'
 import type { FormInstance, FormRules } from 'element-plus'
 import { ElMessage, ElMessageBox } from 'element-plus'
+import { 
+  dataTemplatesList, 
+  dataTemplatesCreate, 
+  dataTemplatesUpdate, 
+  dataTemplatesDelete 
+} from '../../api/dataTemplates'
 
 interface TemplateItem {
   id?: number
@@ -114,6 +117,8 @@ interface TemplateItem {
   code: string
   description: string
   type: string
+  category_id?: number
+  used_n?: number
 }
 
 export default defineComponent({
@@ -129,79 +134,19 @@ export default defineComponent({
       description: '',
       type: 'basic'
     })
+    const templateList = ref<TemplateItem[]>([])
 
-    const templateList = ref<TemplateItem[]>([
-      {
-        id: 1,
-        name: '一般情况',
-        code: 'PR598754612',
-        description: '记录病例一般情况,包括年龄、性别、体重、身高、血型等信息',
-        type: 'basic'
-      },
-      {
-        id: 2,
-        name: '手术信息',
-        code: 'OP784548420',
-        description: '记录手术日期和手术前后病人情况信息',
-        type: 'basic'
-      },
-      {
-        id: 3,
-        name: '血常规',
-        code: 'BL598495468',
-        description: '包括白细胞、红细胞、中性粒细胞、血红蛋白等定量指标',
-        type: 'basic'
-      },
-      {
-        id: 4,
-        name: '生化',
-        code: 'CH888468421',
-        description: '记录总蛋白、总胆红素、转氨酶等肝功能指标',
-        type: 'basic'
-      },
-      {
-        id: 5,
-        name: '血气分析',
-        code: 'BG578481354',
-        description: '记录动脉血分析情况',
-        type: 'basic'
-      },
-      {
-        id: 6,
-        name: '传染病',
-        code: 'CR487121848',
-        description: '记录乙肝表面抗原、抗体、E抗原、E抗体情况',
-        type: 'basic'
-      },
-      {
-        id: 7,
-        name: '凝血',
-        code: 'NX897823151',
-        description: '记录凝血酶原时间、活动部分凝血美元时间、国际标准化比值等',
-        type: 'basic'
-      },
-      {
-        id: 8,
-        name: '心脏彩超',
-        code: 'CC159756125',
-        description: '记录辅助检查信息，心脏彩超情况',
-        type: 'custom'
-      },
-      {
-        id: 9,
-        name: '腹部CT',
-        code: 'CT059789515',
-        description: '记录辅助检查信息，腹部CT检查情况',
-        type: 'custom'
-      },
-      {
-        id: 10,
-        name: '胸部CT',
-        code: 'CT189756125',
-        description: '记录祝福检查信息，胸部CT检查情况',
-        type: 'custom'
-      }
-    ])
+    // 静态数据中的 code 和 type 选项
+    const codeOptions = [
+      'PR598754612', 'OP784548420', 'BL598495468', 'CH888468421', 'BG578481354',
+      'CR487121848', 'NX897823151', 'CC159756125', 'CT059789515', 'CT189756125'
+    ]
+    const typeOptions = ['basic', 'custom']
+
+    // 随机选择函数
+    const getRandomItem = (array: string[]) => {
+      return array[Math.floor(Math.random() * array.length)]
+    }
 
     const rules: FormRules = {
       name: [{ required: true, message: '请输入模版名称', trigger: 'blur' }],
@@ -222,11 +167,30 @@ export default defineComponent({
         (item.name.includes(searchKeyword.value) || item.code.includes(searchKeyword.value)))
     })
 
+    const fetchTemplates = async () => {
+      try {
+        const response = await dataTemplatesList({})
+        console.log(JSON.stringify(response.data.data))
+        // 从后端数据中补充 code 和 type
+        templateList.value = (response.data.data.list || []).map(item => ({
+          ...item,
+          code: item.code || getRandomItem(codeOptions), // 如果后端无 code，随机选择
+          type: item.type || getRandomItem(typeOptions)  // 如果后端无 type，随机选择
+        }))
+      } catch (error) {
+        ElMessage.error('获取模板列表失败')
+        templateList.value = []
+        console.error(error)
+      }
+    }
+
+    fetchTemplates()
+
     const handleAddBasicTemplate = () => {
       isEdit.value = false
       formData.value = {
         name: '',
-        code: '',
+        code: getRandomItem(codeOptions), // 默认随机 code
         description: '',
         type: 'basic'
       }
@@ -237,7 +201,7 @@ export default defineComponent({
       isEdit.value = false
       formData.value = {
         name: '',
-        code: '',
+        code: getRandomItem(codeOptions), // 默认随机 code
         description: '',
         type: 'custom'
       }
@@ -250,40 +214,57 @@ export default defineComponent({
       dialogVisible.value = true
     }
 
-    const handleDelete = (row: TemplateItem) => {
-      ElMessageBox.confirm('确定要删除该模板吗？', '警告', {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
-        type: 'warning'
-      }).then(() => {
+    const handleDelete = async (row: TemplateItem) => {
+      try {
+        await ElMessageBox.confirm('确定要删除该模板吗？', '警告', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        })
+        
+        await dataTemplatesDelete({ id: row.id! })
         templateList.value = templateList.value.filter(item => item.id !== row.id)
         ElMessage.success('删除成功')
-      }).catch(() => {})
+      } catch (error) {
+        if (error !== 'cancel') {
+          ElMessage.error('删除失败')
+          console.error(error)
+        }
+      }
     }
 
     const handleSubmit = async () => {
       if (!formRef.value) return
-      await formRef.value.validate((valid) => {
+      
+      await formRef.value.validate(async (valid) => {
         if (valid) {
-          if (isEdit.value) {
-            const index = templateList.value.findIndex(item => item.id === formData.value.id)
-            if (index > -1) {
-              templateList.value[index] = { ...formData.value, id: formData.value.id }
+          try {
+            if (isEdit.value) {
+              const response = await dataTemplatesUpdate(
+                { id: formData.value.id! },
+                formData.value
+              )
+              const index = templateList.value.findIndex(item => item.id === formData.value.id)
+              if (index > -1) {
+                templateList.value[index] = { ...response.data, code: formData.value.code, type: formData.value.type }
+              }
+              ElMessage.success('编辑成功')
+            } else {
+              const response = await dataTemplatesCreate(formData.value)
+              templateList.value.push({ ...response.data, code: formData.value.code, type: formData.value.type })
+              ElMessage.success('添加成功')
             }
-          } else {
-            templateList.value.push({
-              ...formData.value,
-              id: Date.now()
-            })
+            dialogVisible.value = false
+          } catch (error) {
+            ElMessage.error(isEdit.value ? '编辑失败' : '添加失败')
+            console.error(error)
           }
-          dialogVisible.value = false
-          ElMessage.success(isEdit.value ? '编辑成功' : '添加成功')
         }
       })
     }
 
     const filterTemplates = () => {
-      // 触发过滤逻辑
+      // 本地过滤已通过 computed 属性实现
     }
 
     return {
@@ -315,15 +296,15 @@ export default defineComponent({
   }
 
   .button-icon {
-    width: 25px;  // 设置图标大小
+    width: 25px;
     height: 25px;
-    margin-right: 8px; // 让图标和文字之间有一点间距
+    margin-right: 8px;
   }
 }
 
 .template-container {
   padding: 20px;
-  background-color: #DEDCC7; /* 设置背景颜色 */
+  background-color: #DEDCC7;
   min-height: 100vh;
 
   .template-header {
@@ -333,7 +314,7 @@ export default defineComponent({
     margin-bottom: 20px;
     background: #f5f5f5;
     padding: 10px 20px;
-    border-bottom: 1px solid #e9e9e9;
+    prioritizing-bottom: 1px solid #e9e9e9;
 
     .header-left {
       .el-button-group {
