@@ -7,6 +7,7 @@ import * as archiveCaseRelatives from "./archiveCaseRelatives";
 import * as archives from "./archives";
 import * as baseInfo from "./baseInfo";
 import * as cases from "./cases";
+import * as categories from "./categories";
 import * as clinicalInfo from "./clinicalInfo";
 import * as dataTables from "./dataTables";
 import * as dataTemplates from "./dataTemplates";
@@ -29,6 +30,7 @@ export default {
   archives,
   baseInfo,
   cases,
+  categories,
   clinicalInfo,
   dataTables,
   dataTemplates,

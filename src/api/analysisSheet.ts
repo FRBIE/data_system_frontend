@@ -37,21 +37,21 @@ export async function analysisSheetCreate(
   });
 }
 
-/** 获取、更新或删除指定 ID 的分析表 GET /analysis-sheet//${param0}/ */
+/** 获取、更新或删除指定 ID 的分析表 GET /analysis-sheet/${param0}/ */
 export async function analysisSheetRead(
   // 叠加生成的Param类型 (非body参数swagger默认没有生成对象)
   params: API.analysisSheetReadParams,
   options?: { [key: string]: any }
 ) {
   const { id: param0, ...queryParams } = params;
-  return request<API.AnalysisSheet>(`/analysis-sheet//${param0}/`, {
+  return request<API.AnalysisSheet>(`/analysis-sheet/${param0}/`, {
     method: "GET",
     params: { ...queryParams },
     ...(options || {}),
   });
 }
 
-/** 获取、更新或删除指定 ID 的分析表 PUT /analysis-sheet//${param0}/ */
+/** 获取、更新或删除指定 ID 的分析表 PUT /analysis-sheet/${param0}/ */
 export async function analysisSheetUpdate(
   // 叠加生成的Param类型 (非body参数swagger默认没有生成对象)
   params: API.analysisSheetUpdateParams,
@@ -59,7 +59,7 @@ export async function analysisSheetUpdate(
   options?: { [key: string]: any }
 ) {
   const { id: param0, ...queryParams } = params;
-  return request<API.AnalysisSheet>(`/analysis-sheet//${param0}/`, {
+  return request<API.AnalysisSheet>(`/analysis-sheet/${param0}/`, {
     method: "PUT",
     headers: {
       "Content-Type": "application/json",
@@ -70,21 +70,21 @@ export async function analysisSheetUpdate(
   });
 }
 
-/** 获取、更新或删除指定 ID 的分析表 DELETE /analysis-sheet//${param0}/ */
+/** 获取、更新或删除指定 ID 的分析表 DELETE /analysis-sheet/${param0}/ */
 export async function analysisSheetDelete(
   // 叠加生成的Param类型 (非body参数swagger默认没有生成对象)
   params: API.analysisSheetDeleteParams,
   options?: { [key: string]: any }
 ) {
   const { id: param0, ...queryParams } = params;
-  return request<any>(`/analysis-sheet//${param0}/`, {
+  return request<any>(`/analysis-sheet/${param0}/`, {
     method: "DELETE",
     params: { ...queryParams },
     ...(options || {}),
   });
 }
 
-/** 获取、更新或删除指定 ID 的分析表 PATCH /analysis-sheet//${param0}/ */
+/** 获取、更新或删除指定 ID 的分析表 PATCH /analysis-sheet/${param0}/ */
 export async function analysisSheetPartialUpdate(
   // 叠加生成的Param类型 (非body参数swagger默认没有生成对象)
   params: API.analysisSheetPartialUpdateParams,
@@ -92,7 +92,7 @@ export async function analysisSheetPartialUpdate(
   options?: { [key: string]: any }
 ) {
   const { id: param0, ...queryParams } = params;
-  return request<API.AnalysisSheet>(`/analysis-sheet//${param0}/`, {
+  return request<API.AnalysisSheet>(`/analysis-sheet/${param0}/`, {
     method: "PATCH",
     headers: {
       "Content-Type": "application/json",

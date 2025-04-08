@@ -20,22 +20,26 @@
       </div>
       <div class="header-right">
         <el-input
-          v-model="searchKeyword"
-          placeholder="请输入模版名称关键字"
-          prefix-icon="el-icon-search"
-          @input="filterTemplates"
+            v-model="searchKeyword"
+            placeholder="请输入模版名称关键字"
+            prefix-icon="el-icon-search"
+            @input="filterTemplates"
         />
       </div>
     </div>
 
     <!-- 内容区域 -->
     <div class="template-content">
-      <!-- 基础数据模板 -->
+      <!-- 基础数据模板列表 -->
       <div class="template-section">
         <h3>基础数据模板</h3>
         <el-table :data="filteredBasicTemplates" style="width: 100%" border stripe>
+          <!-- 模板名称 -->
           <el-table-column prop="name" label="模版名称" width="200" />
-          <el-table-column prop="code" label="模版编号" width="200" />
+          <!-- 模板编号 -->
+          <el-table-column prop="id" label="模板编号" width="200" />
+          <!-- 模板分类 -->
+          <el-table-column prop="category_name" label="模板分类" width="200" />
           <el-table-column prop="description" label="模版描述" />
           <el-table-column label="操作" width="200" fixed="right">
             <template #default="scope">
@@ -46,12 +50,16 @@
         </el-table>
       </div>
 
-      <!-- 自定义数据模板 -->
+      <!-- 自定义数据模板列表 -->
       <div class="template-section">
         <h3>自定义数据模板</h3>
         <el-table :data="filteredCustomTemplates" style="width: 100%" border stripe>
+          <!-- 模板名称 -->
           <el-table-column prop="name" label="模版名称" width="200" />
-          <el-table-column prop="code" label="模版编号" width="200" />
+          <!-- 模板编号 -->
+          <el-table-column prop="id" label="模板编号" width="200" />
+          <!-- 模板分类 -->
+          <el-table-column prop="category_name" label="模板分类" width="200" />
           <el-table-column prop="description" label="模版描述" />
           <el-table-column label="操作" width="200" fixed="right">
             <template #default="scope">
@@ -64,29 +72,30 @@
     </div>
 
     <!-- 对话框 - 添加/编辑模板 -->
-    <el-dialog
-      :title="dialogTitle"
-      v-model="dialogVisible"
-      width="500px"
-    >
+    <el-dialog :title="dialogTitle" v-model="dialogVisible" width="500px">
       <el-form :model="formData" :rules="rules" ref="formRef" label-width="100px">
+        <!-- 模板编号：添加时提示自动生成，编辑时回填 -->
+        <el-form-item label="模板编号" prop="id">
+          <el-input
+              v-model="formData.id"
+              placeholder="模板编号由系统自动生成，无需填写"
+              disabled
+          />
+        </el-form-item>
         <el-form-item label="模版名称" prop="name">
           <el-input v-model="formData.name" placeholder="请输入模版名称" />
         </el-form-item>
-        <el-form-item label="模版编号" prop="code">
-          <el-input v-model="formData.code" placeholder="请输入模版编号" />
-        </el-form-item>
         <el-form-item label="模版描述" prop="description">
-          <el-input
-            type="textarea"
-            v-model="formData.description"
-            placeholder="请输入模版描述"
-          />
+          <el-input type="textarea" v-model="formData.description" placeholder="请输入模版描述" />
         </el-form-item>
-        <el-form-item label="模板类型" prop="type">
-          <el-select v-model="formData.type" placeholder="请选择模板类型">
-            <el-option label="基础数据模板" value="basic" />
-            <el-option label="自定义数据模板" value="custom" />
+        <el-form-item label="模板分类" prop="category_id">
+          <el-select v-model="formData.category_id" placeholder="请选择模板分类">
+            <el-option
+                v-for="cat in categoryList"
+                :key="cat.id"
+                :label="cat.name"
+                :value="cat.id"
+            />
           </el-select>
         </el-form-item>
       </el-form>
@@ -104,20 +113,21 @@
 import { defineComponent, ref, computed } from 'vue'
 import type { FormInstance, FormRules } from 'element-plus'
 import { ElMessage, ElMessageBox } from 'element-plus'
-import { 
-  dataTemplatesList, 
-  dataTemplatesCreate, 
-  dataTemplatesUpdate, 
-  dataTemplatesDelete 
+import {
+  dataTemplatesList,
+  dataTemplatesCreate,
+  dataTemplatesUpdate,
+  dataTemplatesDelete
 } from '../../api/dataTemplates'
+import { categoriesList } from "@/api/categories.ts";
 
 interface TemplateItem {
   id?: number
   name: string
-  code: string
   description: string
-  type: string
+  // 移除 code 与 type 字段
   category_id?: number
+  category_name?: string
   used_n?: number
 }
 
@@ -130,53 +140,44 @@ export default defineComponent({
     const formRef = ref<FormInstance>()
     const formData = ref<TemplateItem>({
       name: '',
-      code: '',
       description: '',
-      type: 'basic'
+      category_id: undefined
     })
     const templateList = ref<TemplateItem[]>([])
 
-    // 静态数据中的 code 和 type 选项
-    const codeOptions = [
-      'PR598754612', 'OP784548420', 'BL598495468', 'CH888468421', 'BG578481354',
-      'CR487121848', 'NX897823151', 'CC159756125', 'CT059789515', 'CT189756125'
-    ]
-    const typeOptions = ['basic', 'custom']
-
-    // 随机选择函数
-    const getRandomItem = (array: string[]) => {
-      return array[Math.floor(Math.random() * array.length)]
-    }
+    // 从后端获取的模板分类列表
+    const categoryList = ref<Array<{ id: number; name: string }>>([])
 
     const rules: FormRules = {
       name: [{ required: true, message: '请输入模版名称', trigger: 'blur' }],
-      code: [{ required: true, message: '请输入模版编号', trigger: 'blur' }],
       description: [{ required: true, message: '请输入模版描述', trigger: 'blur' }],
-      type: [{ required: true, message: '请选择模板类型', trigger: 'change' }]
+      category_id: [{ required: true, message: '请选择模板分类', trigger: 'change' }]
+
     }
 
-    const dialogTitle = computed(() => isEdit.value ? '编辑模板' : '添加模板')
+    const dialogTitle = computed(() => (isEdit.value ? '编辑模板' : '添加模板'))
 
+    // 分组过滤：基于后端返回的模板分类名称区分
     const filteredBasicTemplates = computed(() => {
-      return templateList.value.filter(item => item.type === 'basic' && 
-        (item.name.includes(searchKeyword.value) || item.code.includes(searchKeyword.value)))
+      return templateList.value.filter(item =>
+          item.category_name === '基础数据模板' &&
+          item.name.includes(searchKeyword.value)
+      )
     })
 
     const filteredCustomTemplates = computed(() => {
-      return templateList.value.filter(item => item.type === 'custom' && 
-        (item.name.includes(searchKeyword.value) || item.code.includes(searchKeyword.value)))
+      return templateList.value.filter(item =>
+          item.category_name === '自定义数据模板' &&
+          item.name.includes(searchKeyword.value)
+      )
     })
 
     const fetchTemplates = async () => {
       try {
         const response = await dataTemplatesList({})
         console.log(JSON.stringify(response.data.data))
-        // 从后端数据中补充 code 和 type
-        templateList.value = (response.data.data.list || []).map(item => ({
-          ...item,
-          code: item.code || getRandomItem(codeOptions), // 如果后端无 code，随机选择
-          type: item.type || getRandomItem(typeOptions)  // 如果后端无 type，随机选择
-        }))
+        // 直接使用后端返回的模板数据（字段中包含 id、category_id 与 category_name）
+        templateList.value = response.data.data.list || []
       } catch (error) {
         ElMessage.error('获取模板列表失败')
         templateList.value = []
@@ -184,33 +185,60 @@ export default defineComponent({
       }
     }
 
-    fetchTemplates()
+    // 获取模板分类数据
+    const fetchCategories = async () => {
+      try {
+        const response = await categoriesList()
+        categoryList.value = response.data.data.list || []
+      } catch (error) {
+        ElMessage.error('获取模板分类失败')
+        categoryList.value = []
+        console.error(error)
+      }
+    }
 
+    // 辅助函数：根据分类名称查找对应的 category_id
+    const getCategoryId = (name: string): number | undefined => {
+      const cat = categoryList.value.find(item => item.name === name)
+      return cat ? cat.id : undefined
+    }
+
+    fetchTemplates()
+    fetchCategories()
+
+    // 添加基础数据模板时，自动设置 category_id 为“基础数据模板”的 id
     const handleAddBasicTemplate = () => {
       isEdit.value = false
       formData.value = {
         name: '',
-        code: getRandomItem(codeOptions), // 默认随机 code
         description: '',
-        type: 'basic'
+        category_id: getCategoryId('基础数据模板')
       }
       dialogVisible.value = true
     }
 
+    // 添加自定义数据模板时，自动设置 category_id 为“自定义数据模板”的 id
     const handleAddCustomTemplate = () => {
       isEdit.value = false
       formData.value = {
         name: '',
-        code: getRandomItem(codeOptions), // 默认随机 code
         description: '',
-        type: 'custom'
+        category_id: getCategoryId('自定义数据模板')
       }
       dialogVisible.value = true
     }
 
     const handleEdit = (row: TemplateItem) => {
       isEdit.value = true
-      formData.value = { ...row }
+      // 如果 row 中不存在 category_id，则根据 category_name 从 categoryList 查找对应的 id
+      let category_id = row.category_id
+      if (!category_id && row.category_name) {
+        const found = categoryList.value.find(cat => cat.name === row.category_name)
+        if (found) {
+          category_id = found.id
+        }
+      }
+      formData.value = { ...row, category_id }
       dialogVisible.value = true
     }
 
@@ -221,9 +249,9 @@ export default defineComponent({
           cancelButtonText: '取消',
           type: 'warning'
         })
-        
         await dataTemplatesDelete({ id: row.id! })
-        templateList.value = templateList.value.filter(item => item.id !== row.id)
+        // 重新获取模板列表数据，确保显示最新数据
+        await fetchTemplates()
         ElMessage.success('删除成功')
       } catch (error) {
         if (error !== 'cancel') {
@@ -235,25 +263,18 @@ export default defineComponent({
 
     const handleSubmit = async () => {
       if (!formRef.value) return
-      
       await formRef.value.validate(async (valid) => {
         if (valid) {
           try {
             if (isEdit.value) {
-              const response = await dataTemplatesUpdate(
-                { id: formData.value.id! },
-                formData.value
-              )
-              const index = templateList.value.findIndex(item => item.id === formData.value.id)
-              if (index > -1) {
-                templateList.value[index] = { ...response.data, code: formData.value.code, type: formData.value.type }
-              }
+              await dataTemplatesUpdate({ id: formData.value.id! }, formData.value)
               ElMessage.success('编辑成功')
             } else {
-              const response = await dataTemplatesCreate(formData.value)
-              templateList.value.push({ ...response.data, code: formData.value.code, type: formData.value.type })
+              await dataTemplatesCreate(formData.value)
               ElMessage.success('添加成功')
             }
+            // 重新获取模板列表数据，确保显示最新数据
+            await fetchTemplates()
             dialogVisible.value = false
           } catch (error) {
             ElMessage.error(isEdit.value ? '编辑失败' : '添加失败')
@@ -264,7 +285,7 @@ export default defineComponent({
     }
 
     const filterTemplates = () => {
-      // 本地过滤已通过 computed 属性实现
+      // 已通过 computed 实现局部过滤
     }
 
     return {
@@ -277,6 +298,7 @@ export default defineComponent({
       formRef,
       rules,
       dialogTitle,
+      categoryList,
       handleAddBasicTemplate,
       handleAddCustomTemplate,
       handleEdit,
@@ -294,19 +316,16 @@ export default defineComponent({
     display: flex;
     align-items: center;
   }
-
   .button-icon {
     width: 25px;
     height: 25px;
     margin-right: 8px;
   }
 }
-
 .template-container {
   padding: 20px;
-  background-color: #DEDCC7;
+  background-color: #dedcc7;
   min-height: 100vh;
-
   .template-header {
     display: flex;
     justify-content: space-between;
@@ -314,8 +333,7 @@ export default defineComponent({
     margin-bottom: 20px;
     background: #f5f5f5;
     padding: 10px 20px;
-    prioritizing-bottom: 1px solid #e9e9e9;
-
+    border-bottom: 1px solid #e9e9e9;
     .header-left {
       .el-button-group {
         .el-button {
@@ -323,24 +341,19 @@ export default defineComponent({
         }
       }
     }
-
     .header-right {
       width: 300px;
     }
   }
-
   .template-content {
     padding: 20px;
-
     .template-section {
       margin-bottom: 30px;
-
       h3 {
         font-size: 18px;
         color: #333;
         margin-bottom: 10px;
       }
-
       .el-table {
         background: #fff;
         border-radius: 4px;

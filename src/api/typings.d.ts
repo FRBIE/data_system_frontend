@@ -199,6 +199,33 @@ declare namespace API {
     id: number;
   };
 
+  type categoriesDeleteParams = {
+    /** A unique value identifying this data template category. */
+    id: number;
+  };
+
+  type categoriesListParams = {
+    /** A page number within the paginated result set. */
+    page?: number;
+    /** Number of results to return per page. */
+    page_size?: number;
+  };
+
+  type categoriesPartialUpdateParams = {
+    /** A unique value identifying this data template category. */
+    id: number;
+  };
+
+  type categoriesReadParams = {
+    /** A unique value identifying this data template category. */
+    id: number;
+  };
+
+  type categoriesUpdateParams = {
+    /** A unique value identifying this data template category. */
+    id: number;
+  };
+
   type ClinicalInfo = {
     /** ID */
     id?: number;
@@ -275,21 +302,30 @@ declare namespace API {
     id: number;
   };
 
+  type DataTemplateCategory = {
+    /** Id */
+    id: number;
+    /** Name */
+    name: string;
+  };
+
   type DataTemplates = {
     /** Id */
-    id?: number;
+    id: string;
     /** Name */
     name: string;
     /** Description */
     description?: string;
     /** Category id */
     category_id: number;
+    /** Category name */
+    category_name?: string;
     /** Used n */
-    used_n: number;
+    used_n?: number;
   };
 
   type dataTemplatesDeleteParams = {
-    /** A unique integer value identifying this data template. */
+    /** A unique value identifying this data template. */
     id: number;
   };
 
@@ -301,17 +337,17 @@ declare namespace API {
   };
 
   type dataTemplatesPartialUpdateParams = {
-    /** A unique integer value identifying this data template. */
+    /** A unique value identifying this data template. */
     id: number;
   };
 
   type dataTemplatesReadParams = {
-    /** A unique integer value identifying this data template. */
+    /** A unique value identifying this data template. */
     id: number;
   };
 
   type dataTemplatesUpdateParams = {
-    /** A unique integer value identifying this data template. */
+    /** A unique value identifying this data template. */
     id: number;
   };
 
