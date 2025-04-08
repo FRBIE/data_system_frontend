@@ -16,6 +16,7 @@ import * as documentCharts from "./documentCharts";
 import * as documents from "./documents";
 import * as examinationImages from "./examinationImages";
 import * as examinationSheets from "./examinationSheets";
+import * as genderCount from "./genderCount";
 import * as identity from "./identity";
 import * as images from "./images";
 import * as login from "./login";
@@ -39,6 +40,7 @@ export default {
   documents,
   examinationImages,
   examinationSheets,
+  genderCount,
   identity,
   images,
   login,

@@ -4,11 +4,11 @@
       <el-form :inline="true" :model="filterForm">
         <el-form-item label="时间范围">
           <el-date-picker
-            v-model="filterForm.dateRange"
-            type="daterange"
-            range-separator="至"
-            start-placeholder="开始日期"
-            end-placeholder="结束日期"
+              v-model="filterForm.dateRange"
+              type="daterange"
+              range-separator="至"
+              start-placeholder="开始日期"
+              end-placeholder="结束日期"
           />
         </el-form-item>
         <el-form-item label="数据类型">
@@ -77,6 +77,8 @@
 import { defineComponent, ref, onMounted } from 'vue'
 import * as echarts from 'echarts'
 import type { ECharts } from 'echarts'
+import {genderCountList} from "@/api/genderCount.ts";
+
 
 export default defineComponent({
   name: 'Visualization',
@@ -97,7 +99,7 @@ export default defineComponent({
     const initAgeChart = () => {
       if (!ageChart.value) return
       ageChartInstance = echarts.init(ageChart.value)
-      
+
       const option = {
         title: {
           text: '年龄分布'
@@ -121,10 +123,9 @@ export default defineComponent({
       ageChartInstance.setOption(option)
     }
 
-    const initGenderChart = () => {
+    const initGenderChart = (genderData: { 0: number; 1: number }) => {
       if (!genderChart.value) return
       genderChartInstance = echarts.init(genderChart.value)
-      
       const option = {
         title: {
           text: '性别比例'
@@ -141,8 +142,8 @@ export default defineComponent({
             type: 'pie',
             radius: '50%',
             data: [
-              { value: 235, name: '男' },
-              { value: 274, name: '女' }
+              { value: genderData[0], name: '女' },
+              { value: genderData[1], name: '男' }
             ],
             emphasis: {
               itemStyle: {
@@ -161,7 +162,7 @@ export default defineComponent({
     const initTrendChart = () => {
       if (!trendChart.value) return
       trendChartInstance = echarts.init(trendChart.value)
-      
+
       const option = {
         title: {
           text: '趋势分析'
@@ -213,10 +214,22 @@ export default defineComponent({
       console.log('导出图表:', type)
     }
 
+    // 从后端获取性别比例数据
+    const fetchGenderData = async () => {
+      try {
+        const response = await genderCountList()
+        if (response.data.code === 200 && response.data.data) {
+          initGenderChart(response.data.data)
+        }
+      } catch (error) {
+        console.error('获取性别比例数据失败:', error)
+      }
+    }
+
     onMounted(() => {
       initAgeChart()
-      initGenderChart()
       initTrendChart()
+      fetchGenderData()
 
       window.addEventListener('resize', () => {
         ageChartInstance?.resize()
@@ -265,4 +278,4 @@ export default defineComponent({
     }
   }
 }
-</style> 
+</style>

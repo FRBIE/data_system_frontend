@@ -163,7 +163,7 @@ declare namespace API {
 
   type Cases = {
     /** Id */
-    id: number;
+    id?: string;
     /** Case id */
     case_id: string;
     /** Identity id */
@@ -311,7 +311,7 @@ declare namespace API {
 
   type DataTemplates = {
     /** Id */
-    id: string;
+    id?: string;
     /** Name */
     name: string;
     /** Description */
