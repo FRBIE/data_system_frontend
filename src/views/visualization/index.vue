@@ -79,7 +79,6 @@ import * as echarts from 'echarts'
 import type { ECharts } from 'echarts'
 import {genderCountList} from "@/api/genderCount.ts";
 
-
 export default defineComponent({
   name: 'Visualization',
   setup() {
@@ -126,25 +125,36 @@ export default defineComponent({
     const initGenderChart = (genderData: { 0: number; 1: number }) => {
       if (!genderChart.value) return
       genderChartInstance = echarts.init(genderChart.value)
+
       const option = {
         title: {
           text: '性别比例'
         },
         tooltip: {
-          trigger: 'item'
+          trigger: 'item',
         },
         legend: {
           orient: 'vertical',
-          left: 'left'
+          left: 'left',
+          top: 'center',
+          padding: [0, 20],
+          itemWidth: 10,
+          itemHeight: 10
         },
         series: [
           {
             type: 'pie',
             radius: '50%',
+            center: ['50%', '50%'],
             data: [
               { value: genderData[0], name: '女' },
               { value: genderData[1], name: '男' }
             ],
+            label: {
+              formatter: '{b}: {c} ({d}%)',
+              position: 'outside',
+              distanceToLabelLine: 10
+            },
             emphasis: {
               itemStyle: {
                 shadowBlur: 10,
