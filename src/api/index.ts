@@ -2,6 +2,7 @@
 /* eslint-disable */
 // API 更新时间：
 // API 唯一标识：
+import * as ageDistribution from "./ageDistribution";
 import * as analysisSheet from "./analysisSheet";
 import * as archiveCaseRelatives from "./archiveCaseRelatives";
 import * as archives from "./archives";
@@ -26,6 +27,7 @@ import * as testingSheets from "./testingSheets";
 import * as texts from "./texts";
 import * as token from "./token";
 export default {
+  ageDistribution,
   analysisSheet,
   archiveCaseRelatives,
   archives,

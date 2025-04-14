@@ -77,7 +77,8 @@
 import { defineComponent, ref, onMounted } from 'vue'
 import * as echarts from 'echarts'
 import type { ECharts } from 'echarts'
-import {genderCountList} from "@/api/genderCount.ts";
+import { genderCountList } from "@/api/genderCount.ts"
+import { ageDistributionList } from "@/api/ageDistribution.ts"  // 导入年龄分布接口
 
 export default defineComponent({
   name: 'Visualization',
@@ -95,7 +96,8 @@ export default defineComponent({
     let genderChartInstance: ECharts | null = null
     let trendChartInstance: ECharts | null = null
 
-    const initAgeChart = () => {
+    // 初始化年龄分布图表，设置默认 option（后续会用真实数据替换）
+    const initAgeChart = (data: number[]) => {
       if (!ageChart.value) return
       ageChartInstance = echarts.init(ageChart.value)
 
@@ -114,12 +116,42 @@ export default defineComponent({
           type: 'value'
         },
         series: [{
-          data: [10, 52, 78, 45, 15],
+          data: data, // 使用后端返回的数据替换假数据
           type: 'bar'
         }]
       }
-
       ageChartInstance.setOption(option)
+    }
+
+    // 获取后端年龄分布数据，并更新图表数据
+    const fetchAgeDistributionData = async () => {
+      try {
+        const response = await ageDistributionList()
+        if (response.data.code === 200 && response.data.data) {
+          const dist = response.data.data
+          // 构造一个数组顺序对应 xAxis 的分段标签
+          const dataArr = [
+            dist.range_0_20,
+            dist.range_21_40,
+            dist.range_41_60,
+            dist.range_61_80,
+            dist.range_81_plus  // 后端接口返回的 key 可能为 range_81_plus
+          ]
+          // 更新或初始化年龄分布图表
+          if (ageChartInstance) {
+            ageChartInstance.setOption({
+              series: [{
+                data: dataArr
+              }]
+            })
+          } else {
+            // 初次渲染时初始化
+            initAgeChart(dataArr)
+          }
+        }
+      } catch (error) {
+        console.error('获取年龄分布数据失败:', error)
+      }
     }
 
     const initGenderChart = (genderData: { 0: number; 1: number }) => {
@@ -237,9 +269,9 @@ export default defineComponent({
     }
 
     onMounted(() => {
-      initAgeChart()
       initTrendChart()
       fetchGenderData()
+      fetchAgeDistributionData()  // 调用接口获取真实年龄分布数据
 
       window.addEventListener('resize', () => {
         ageChartInstance?.resize()
@@ -260,6 +292,7 @@ export default defineComponent({
   }
 })
 </script>
+
 
 <style scoped lang="scss">
 .visualization-container {
