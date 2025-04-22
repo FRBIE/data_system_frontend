@@ -6,36 +6,44 @@
       <div class="chart-types">
         <el-radio-group v-model="currentChart" class="chart-selector">
           <el-radio-button label="bar">
+  
             <img src="@/assets/5-1.png" class="chart-icon" />
-            柱状图
+            <span>柱状图</span>
           </el-radio-button>
           <el-radio-button label="bar-h">
+
             <img src="@/assets/5-2.png" class="chart-icon" />
-            水平柱状图
+            <span>水平柱状图</span>
           </el-radio-button>
           <el-radio-button label="line">
+
             <img src="@/assets/5-3.png" class="chart-icon" />
-            折线图
+            <span>折线图</span>
           </el-radio-button>
           <el-radio-button label="scatter">
+   
             <img src="@/assets/5-4.png" class="chart-icon" />
-            散点图
+            <span>散点图</span>
           </el-radio-button>
           <el-radio-button label="heatmap">
+
             <img src="@/assets/5-5.png" class="chart-icon" />
-            热力图
+            <span>热力图</span>
           </el-radio-button>
           <el-radio-button label="gri">
+
             <img src="@/assets/5-6.png" class="chart-icon" />
-            生存曲线图
+            <span>生存曲线图</span>
           </el-radio-button>
           <el-radio-button label="pie">
+
             <img src="@/assets/5-7.png" class="chart-icon" />
-            饼图
+            <span>饼图</span>
           </el-radio-button>
           <el-radio-button label="grid">
+
             <img src="@/assets/5-8.png" class="chart-icon" />
-            统计三线表
+            <span>统计三线表</span>
           </el-radio-button>
         </el-radio-group>
       </div>
@@ -253,16 +261,23 @@ export default defineComponent({
   .el-radio-button {
     display: flex;
     flex-direction: column;
-    align-items: center;
+    align-items: center; // 确保整体内容水平居中
     justify-content: center;
     text-align: center;
-    padding: 10px;
+    padding: 15px;
+    min-width: 100px;
+
+    span {
+      display: block; // 确保 span 占满宽度，便于居中对齐
+      width: 100%; // 确保文字宽度与图标一致
+      text-align: center; // 文字水平居中
+    }
   }
 
   .chart-icon {
-    width: 24px;
-    height: 24px;
-    margin-bottom: 4px;
+    width: 64px;
+    height: 64px;
+    margin-top: 16px; // 图标在文字下方，增加顶部间距
   }
 }
 
@@ -316,15 +331,15 @@ export default defineComponent({
 
         .el-button {
           width: 100%;
-          text-align: left; // 强制文本左对齐
-          padding: 10px 12px; // 统一内边距，调整左侧内边距
+          text-align: left;
+          padding: 10px 12px;
           box-sizing: border-box;
           font-size: 14px;
           line-height: 1;
-          margin: 0; // 移除可能的外边距
-          display: flex; // 使用 flex 布局
-          justify-content: flex-start; // 强制内容左对齐
-          align-items: center; // 垂直居中
+          margin: 0;
+          display: flex;
+          justify-content: flex-start;
+          align-items: center;
         }
       }
 
@@ -363,8 +378,8 @@ export default defineComponent({
         .el-button {
           color: #333;
           &.is-active {
-            color: #409EFF;
-            border-bottom: 2px solid #409EFF;
+            color: #ecf0f4;
+            border-bottom: 2px solid #f4f4f4;
           }
         }
       }

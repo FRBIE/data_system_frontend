@@ -31,6 +31,7 @@
         <img src="@/assets/4.png" class="menu-icon" />
         <span>结果可视化</span>
       </el-menu-item>
+      
     </el-menu>
   </div>
 </template>
