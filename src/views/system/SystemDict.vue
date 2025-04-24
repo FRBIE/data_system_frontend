@@ -544,32 +544,42 @@ export default defineComponent({
           }
         })
         
-        console.log('导入响应:', response.data) // 添加调试日志
+        console.log('导入响应原始数据:', response)
+        console.log('导入响应数据:', response.data)
         
-        // 处理响应 - 修复解析逻辑
-        importResult.value = {
-          // 确保把后端的success属性正确解析
-          success: response.data.success === true,
-          message: response.data.message || '导入完成',
-          errors: response.data.errors || []
+        // 修复导入结果解析逻辑
+        if (response.data) {
+          // 正确解析导入结果
+          if (response.data.success === true || (response.status === 200 && !response.data.error)) {
+            importResult.value = {
+              success: true,
+              message: response.data.message || '导入成功完成',
+              errors: response.data.errors || []
+            }
+            
+            // 添加成功提示
+            ElMessage.success(importResult.value.message)
+            
+            // 立即刷新数据列表
+            await fetchDictList()
+          } else {
+            // 处理导入失败的情况
+            importResult.value = {
+              success: false,
+              message: response.data.error || '导入失败',
+              errors: response.data.errors || []
+            }
+            ElMessage.error(importResult.value.message)
+          }
         }
-        
-        // 添加成功提示
-        if (response.data.success) {
-          ElMessage.success(response.data.message || '导入成功')
-          await fetchDictList()
-        } else {
-          ElMessage.error(response.data.error || '导入失败')
-        }
-        
       } catch (error: any) {
         console.error('导入出错:', error)
         importResult.value = {
           success: false,
           message: error.response?.data?.error || '导入失败，请重试',
-          errors: []
+          errors: error.response?.data?.errors || []
         }
-        ElMessage.error(error.response?.data?.error || '导入失败，请重试')
+        ElMessage.error(importResult.value.message)
       } finally {
         // 上传完成
         uploading.value = false
