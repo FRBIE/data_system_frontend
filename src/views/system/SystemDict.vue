@@ -7,18 +7,49 @@
       <div class="main-content">
         <div class="dict-header">
           <div class="button-group">
-            <el-button word_class="primary" plain>
-            <img src="@/assets/1-1.png" class="menu-icon" />
-            全部词条
-          </el-button>
+            <el-button type="primary" plain>
+              <img src="@/assets/1-1.png" class="menu-icon" />
+              全部词条
+            </el-button>
 
-          <el-button word_class="primary" plain @click="handleAdd">
-            <img src="@/assets/1-2.png" class="menu-icon" />
-            添加词条
-          </el-button>
-
+            <el-button type="primary" plain @click="handleAdd">
+              <img src="@/assets/1-2.png" class="menu-icon" />
+              添加词条
+            </el-button>
+            
+            <!-- 添加批量删除按钮 -->
+            <el-button 
+              type="danger" 
+              plain 
+              :disabled="selectedItems.length === 0"
+              @click="handleBatchDelete"
+            >
+              <el-icon><Delete /></el-icon>
+              批量删除
+            </el-button>
+            
+            <!-- 添加批量导入按钮 -->
+            <el-upload
+              class="upload-btn"
+              action=""
+              :auto-upload="false"
+              :show-file-list="false"
+              accept=".csv"
+              :on-change="handleFileChange"
+              :disabled="uploading"
+            >
+              <el-button type="primary" plain :loading="uploading">
+                <el-icon><Upload /></el-icon>
+                {{ uploading ? '导入中...' : '批量导入' }}
+              </el-button>
+            </el-upload>
+            
+            <!-- 添加下载模板按钮 -->
+            <el-button type="primary" plain @click="downloadTemplate" :disabled="uploading">
+              <el-icon><Download /></el-icon>
+              下载模板
+            </el-button>
           </div>
-
 
           <el-input
             v-model="searchKeyword"
@@ -32,14 +63,23 @@
           </el-input>
         </div>
 
-        <el-table :data="filteredDictList" style="width: 100%" border stripe>
+        <!-- 现有表格内容 -->
+        <el-table 
+          :data="dictList" 
+          style="width: 100%" 
+          border 
+          stripe 
+          v-loading="tableLoading"
+          @selection-change="handleSelectionChange"
+        >
+          <el-table-column type="selection" width="55" />
           <el-table-column prop="word_name" label="中文名称" width="120" />
           <el-table-column prop="word_eng" label="英文名称" width="150" />
           <el-table-column prop="word_short" label="英文缩写" width="100" />
           <el-table-column prop="word_code" label="词条编号" width="120" />
           <el-table-column prop="word_class" label="词条类型" width="120">
             <template #default="{ row }">
-              <el-tag :word_class="getTagword_class(row.word_class)">{{ row.word_class }}</el-tag>
+              <el-tag :type="getTagType(row.word_class)">{{ row.word_class }}</el-tag>
             </template>
           </el-table-column>
           <el-table-column prop="word_apply" label="词条应用" width="120" />
@@ -47,11 +87,25 @@
           <el-table-column prop="actions" label="操作" width="200" fixed="right">
             <template #default="{ row }">
               <el-button size="small" @click="handleEdit(row)">编辑</el-button>
-              <el-button size="small" word_class="danger" @click="handleDelete(row)">删除</el-button>
+              <el-button size="small" type="danger" @click="handleDelete(row)">删除</el-button>
             </template>
           </el-table-column>
         </el-table>
+        
+        <!-- 添加分页组件 -->
+        <div class="pagination-container">
+          <el-pagination
+            v-model:current-page="currentPage"
+            v-model:page-size="pageSize"
+            :page-sizes="[10, 20, 50, 100]"
+            layout="total, sizes, prev, pager, next, jumper"
+            :total="totalItems"
+            @size-change="handleSizeChange"
+            @current-change="handleCurrentChange"
+          />
+        </div>
 
+        <!-- 现有对话框 -->
         <el-dialog
           :title="dialogTitle"
           v-model="dialogVisible"
@@ -87,7 +141,58 @@
           <template #footer>
             <span class="dialog-footer">
               <el-button @click="dialogVisible = false">取 消</el-button>
-              <el-button word_class="primary" @click="handleSubmit">确 定</el-button>
+              <el-button type="primary" @click="handleSubmit">确 定</el-button>
+            </span>
+          </template>
+        </el-dialog>
+        
+        <!-- 简化的导入结果对话框 -->
+        <el-dialog
+          title="导入结果"
+          v-model="importResultVisible"
+          width="500px"
+        >
+          <div class="import-result">
+            <!-- 显示加载中 -->
+            <div v-if="uploading" class="loading-container">
+              <el-icon class="loading-icon"><Loading /></el-icon>
+              <p>正在导入数据，请稍候...</p>
+            </div>
+            
+            <!-- 导入成功或失败提示 -->
+            <div v-if="!uploading" class="result-container">
+              <el-alert
+                v-if="importResult.success"
+                type="success"
+                :title="importResult.message"
+                :closable="false"
+                show-icon
+              />
+              <el-alert
+                v-else
+                type="error"
+                :title="importResult.message || '导入失败'"
+                :closable="false"
+                show-icon
+              />
+              
+              <!-- 错误列表 -->
+              <div v-if="importResult.errors && importResult.errors.length > 0" class="error-list-container">
+                <p class="error-list-title">错误详情：</p>
+                <ul class="error-list">
+                  <li v-for="(error, index) in importResult.errors" :key="index" class="error-item">
+                    {{ error }}
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </div>
+          <template #footer>
+            <span class="dialog-footer">
+              <el-button @click="importResultVisible = false" v-if="!uploading">关闭</el-button>
+              <el-button type="primary" @click="refreshAfterImport" v-if="!uploading && importResult.success">
+                确定并刷新
+              </el-button>
             </span>
           </template>
         </el-dialog>
@@ -96,10 +201,11 @@
   </div>
 </template>
 <script lang="ts">
-import {defineComponent, ref, computed, onMounted} from 'vue'
-import { Plus, Search } from '@element-plus/icons-vue'
+import {defineComponent, ref, computed, onMounted, watch} from 'vue'
+import { Plus, Search, Upload, Download, Loading, Delete } from '@element-plus/icons-vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { dictionaryList, dictionaryCreate, dictionaryUpdate, dictionaryDelete } from '@/api/dictionary'
+import axios from 'axios'
 
 interface DictItem {
   id?: number
@@ -116,13 +222,28 @@ export default defineComponent({
   name: 'SystemDict',
   components: {
     Plus,
-    Search
+    Search,
+    Upload,
+    Download,
+    Loading,
+    Delete
   },
   setup() {
     const searchKeyword = ref('')
     const dialogVisible = ref(false)
+    const importResultVisible = ref(false)
     const isEdit = ref(false)
     const formRef = ref()
+    const tableLoading = ref(false)
+    
+    // 分页相关
+    const currentPage = ref(1)
+    const pageSize = ref(10)
+    const totalItems = ref(0)
+    const selectedItems = ref<DictItem[]>([])
+    
+    // 上传状态相关
+    const uploading = ref(false)
 
     const formData = ref<DictItem>({
       word_name: '',
@@ -135,6 +256,16 @@ export default defineComponent({
     })
 
     const dictList = ref<DictItem[]>([])
+
+    const importResult = ref<{
+      success?: boolean;
+      message: string;
+      errors?: string[];
+    }>({
+      success: false,
+      message: '',
+      errors: []
+    })
 
     const rules = {
       word_name: [{ required: true, message: '请输入中文名称', trigger: 'blur' }],
@@ -159,25 +290,137 @@ export default defineComponent({
       )
     })
 
-    const getTagword_class = (word_class: string) => {
-      const word_classMap: Record<string, string> = {
+    // 分页相关计算属性
+    const pagedDictList = computed(() => {
+      const start = (currentPage.value - 1) * pageSize.value
+      const end = start + pageSize.value
+      return filteredDictList.value.slice(start, end)
+    })
+
+    // 处理多选变化
+    const handleSelectionChange = (selection: DictItem[]) => {
+      selectedItems.value = selection
+    }
+
+    // 处理每页显示数量变化
+    const handleSizeChange = (size: number) => {
+      pageSize.value = size
+      currentPage.value = 1 // 重置到第一页
+      fetchDictList() // 重新请求数据
+    }
+
+    // 处理页码变化
+    const handleCurrentChange = (page: number) => {
+      currentPage.value = page
+      fetchDictList() // 重新请求数据
+    }
+
+    // 批量删除
+    const handleBatchDelete = async () => {
+      if (selectedItems.value.length === 0) {
+        return
+      }
+
+      try {
+        await ElMessageBox.confirm(
+          `确定要批量删除选中的 ${selectedItems.value.length} 条词条吗？`,
+          '警告',
+          {
+            confirmButtonText: '确定',
+            cancelButtonText: '取消',
+            type: 'warning'
+          }
+        )
+
+        tableLoading.value = true
+        let successCount = 0;
+        let failCount = 0;
+        
+        // 修改为更可靠的删除方式：逐个调用删除API
+        for (const item of selectedItems.value) {
+          if (item.id) {
+            try {
+              console.log('发送批量删除请求，ID:', item.id);
+              // 使用现有的单个删除API，确保每个删除请求都能正确发送
+              await dictionaryDelete({ id: item.id })
+              successCount++;
+            } catch (e) {
+              console.error(`删除词条${item.word_name}(ID:${item.id})失败:`, e)
+              failCount++;
+            }
+          }
+        }
+        
+        // 刷新数据列表
+        await fetchDictList()
+        ElMessage.success(`成功删除 ${successCount} 条记录` + (failCount > 0 ? `，${failCount} 条记录删除失败` : ''))
+        selectedItems.value = [] // 清空选中项
+        
+      } catch (error) {
+        console.error('批量删除失败:', error)
+        if (error !== 'cancel') {
+          ElMessage.error('批量删除失败')
+        }
+      } finally {
+        tableLoading.value = false
+      }
+    }
+
+    const getTagType = (word_class: string) => {
+      const typeMap: Record<string, string> = {
         template: 'warning',
         clinical: 'success',
         indicator: 'danger'
       }
-      return word_classMap[word_class] || 'info'
+      return typeMap[word_class] || 'info'
     }
 
     // 获取词条列表
     const fetchDictList = async () => {
-      // debugger
+      tableLoading.value = true
       try {
-        const res = await dictionaryList({})
-        console.log(JSON.stringify(res.data.data))
-        dictList.value = res.data.data.list
+        // 修改为使用后端分页
+        const params = {
+          page: currentPage.value,
+          page_size: pageSize.value
+        }
+        
+        // 如果有搜索关键词，添加到请求参数
+        if (searchKeyword.value) {
+          params['search'] = searchKeyword.value
+        }
+        
+        const res = await dictionaryList(params)
+        console.log('获取词条列表响应:', res.data)
+        
+        // 修正为解析正确的嵌套数据结构
+        if (res.data && res.data.data && res.data.data.results) {
+          // 正确的数据格式: { code: 200, data: { count: x, results: [...] }, msg: "success" }
+          dictList.value = res.data.data.results
+          totalItems.value = res.data.data.count || 0
+          console.log('总条数:', totalItems.value)
+          console.log('当前数据:', dictList.value)
+        } else if (res.data.results) {
+          // 备用格式1
+          dictList.value = res.data.results
+          totalItems.value = res.data.count || 0
+        } else if (res.data.list) {
+          // 备用格式2
+          dictList.value = res.data.list
+          totalItems.value = res.data.total || 0
+        } else {
+          // 兜底处理
+          dictList.value = Array.isArray(res.data) ? res.data : []
+          totalItems.value = dictList.value.length
+        }
+        
       } catch (error) {
         console.error('获取词条列表失败:', error)
         ElMessage.error('获取词条列表失败')
+        dictList.value = []
+        totalItems.value = 0
+      } finally {
+        tableLoading.value = false
       }
     }
 
@@ -209,17 +452,31 @@ export default defineComponent({
             {
               confirmButtonText: '确定',
               cancelButtonText: '取消',
-              word_class: 'warning'
+              type: 'warning'
             }
         )
 
         if (row.id) {
-          await dictionaryDelete({ id: row.id })
-          await fetchDictList()
-          ElMessage.success('删除成功')
+          tableLoading.value = true
+          try {
+            console.log('发送删除请求，ID:', row.id)
+            const response = await dictionaryDelete({ id: row.id })
+            console.log('删除响应:', response)
+            ElMessage.success('删除成功')
+            await fetchDictList() // 刷新列表
+          } catch (error) {
+            console.error('删除请求失败:', error)
+            ElMessage.error('删除失败，请重试')
+          } finally {
+            tableLoading.value = false
+          }
+        } else {
+          ElMessage.warning('该记录没有ID，无法删除')
         }
       } catch (error) {
-        console.error('删除词条失败:', error)
+        if (error !== 'cancel') {
+          console.error('删除词条失败:', error)
+        }
       }
     }
 
@@ -250,6 +507,101 @@ export default defineComponent({
       }
     }
 
+    const handleFileChange = async (file: any) => {
+      // 检查文件类型
+      if (!file.raw.name.endsWith('.csv')) {
+        ElMessage.error('只支持上传CSV文件格式')
+        return
+      }
+      
+      // 检查文件大小（限制为2MB）
+      if (file.raw.size / 1024 / 1024 > 2) {
+        ElMessage.error('文件大小不能超过2MB')
+        return
+      }
+      
+      // 重置导入结果
+      importResult.value = {
+        success: false,
+        message: '',
+        errors: []
+      }
+      
+      // 创建FormData对象
+      const formData = new FormData()
+      formData.append('file', file.raw)
+      
+      // 开始上传流程
+      uploading.value = true
+      importResultVisible.value = true
+      tableLoading.value = true
+      
+      try {
+        // 发送请求
+        const response = await axios.post('/api/dictionary/import/', formData, {
+          headers: {
+            'Content-Type': 'multipart/form-data'
+          }
+        })
+        
+        console.log('导入响应:', response.data) // 添加调试日志
+        
+        // 处理响应 - 修复解析逻辑
+        importResult.value = {
+          // 确保把后端的success属性正确解析
+          success: response.data.success === true,
+          message: response.data.message || '导入完成',
+          errors: response.data.errors || []
+        }
+        
+        // 添加成功提示
+        if (response.data.success) {
+          ElMessage.success(response.data.message || '导入成功')
+          await fetchDictList()
+        } else {
+          ElMessage.error(response.data.error || '导入失败')
+        }
+        
+      } catch (error: any) {
+        console.error('导入出错:', error)
+        importResult.value = {
+          success: false,
+          message: error.response?.data?.error || '导入失败，请重试',
+          errors: []
+        }
+        ElMessage.error(error.response?.data?.error || '导入失败，请重试')
+      } finally {
+        // 上传完成
+        uploading.value = false
+        tableLoading.value = false
+      }
+    }
+
+    // 下载导入模板
+    const downloadTemplate = () => {
+      // 创建下载链接
+      const link = document.createElement('a')
+      link.href = '/api/dictionary/import-template/'
+      link.download = 'dictionary_import_template.csv'
+      document.body.appendChild(link)
+      link.click()
+      document.body.removeChild(link)
+    }
+
+    // 刷新数据并关闭对话框
+    const refreshAfterImport = async () => {
+      tableLoading.value = true
+      try {
+        await fetchDictList()
+        importResultVisible.value = false
+        ElMessage.success('数据已刷新')
+      } catch (error) {
+        console.error('刷新数据失败:', error)
+      } finally {
+        tableLoading.value = false
+      }
+    }
+
     onMounted(() => {
       fetchDictList()
     })
@@ -263,11 +615,27 @@ export default defineComponent({
       dialogTitle,
       dictList,
       filteredDictList,
-      getTagword_class,
+      getTagType,
       handleAdd,
       handleEdit,
       handleDelete,
-      handleSubmit
+      handleSubmit,
+      importResult,
+      importResultVisible,
+      uploading,
+      handleFileChange,
+      downloadTemplate,
+      refreshAfterImport,
+      tableLoading,
+      pagedDictList,
+      handleSelectionChange,
+      handleSizeChange,
+      handleCurrentChange,
+      currentPage,
+      pageSize,
+      totalItems,
+      handleBatchDelete,
+      selectedItems
     }
   }
 })
@@ -342,5 +710,83 @@ export default defineComponent({
     background-color: #fff;
     border: 1px solid #e9e9e9;
   }
+  
+  // 添加导入相关样式
+  .upload-btn {
+    display: inline-block;
+  }
+  
+  .import-result {
+    .progress-container {
+      margin-bottom: 20px;
+      
+      .progress-text {
+        margin-top: 10px;
+        color: #606266;
+        text-align: center;
+        font-size: 14px;
+      }
+    }
+    
+    .success-container, .error-container {
+      padding: 0 0 20px;
+    }
+    
+    .stats-container {
+      display: flex;
+      justify-content: center;
+      margin-top: 15px;
+      
+      .stat-item {
+        display: flex;
+        align-items: center;
+        margin: 0 15px;
+        font-size: 16px;
+        
+        .el-icon {
+          margin-right: 5px;
+          font-size: 18px;
+        }
+        
+        &.success {
+          color: #67c23a;
+        }
+        
+        &.error {
+          color: #f56c6c;
+        }
+      }
+    }
+    
+    .result-message {
+      font-size: 16px;
+      margin-bottom: 15px;
+      font-weight: 500;
+    }
+    
+    .error-details {
+      margin-top: 20px;
+    }
+    
+    .error-list {
+      max-height: 300px;
+      overflow-y: auto;
+      border: 1px solid #f0f0f0;
+      border-radius: 4px;
+      padding: 10px;
+      background-color: #fafafa;
+      
+      .error-item {
+        color: #f56c6c;
+        margin-bottom: 5px;
+        line-height: 1.5;
+      }
+    }
+  }
 }
+.pagination-container {
+    margin-top: 20px;
+    display: flex;
+    justify-content: flex-end;
+  }
 </style>
